@@ -77,7 +77,7 @@ class UserSettings(BaseModel):
         "from-attributes": True
     }
 
-
+# the link token gets passes to the client 
 @app.post("/link-token")
 def create_link_token(user_settings: UserSettings):
     # hit create link token on plain
@@ -104,4 +104,30 @@ def create_link_token(user_settings: UserSettings):
 
     return link_token
 
-    
+
+# exchange the link token for an access token
+# in prod change this to db for the user requesting
+access_token = None
+item_id = None
+
+class PublicTokenRequest(BaseModel):
+    public_token: str
+
+
+@app.post("/exchange-public-token")
+def exchange_public_token(payload: PublicTokenRequest):
+    global access_token, item_id 
+
+
+    public_token = payload.public_token
+    request = ItemPublicTokenExchangeRequest(
+      public_token=public_token
+    )
+    response = client.item_public_token_exchange(request)
+
+    # These values should be saved to a persistent database and
+    # associated with the currently signed-in user
+    access_token = response['access_token']
+    item_id = response['item_id']
+
+    return "success"
