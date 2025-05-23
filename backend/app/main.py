@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from . import database, crud, schemas
 
-app = FastAPI(title="Spending Coach API")
+app = FastAPI(title="Personal CFO API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,3 +26,7 @@ def health():
 @app.post("/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
+
+@app.get("/link-token")
+def get_token():
+    
