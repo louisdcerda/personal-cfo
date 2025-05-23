@@ -7,18 +7,17 @@ from typing import Optional
 import os
 
 # plaid imports 
-from plaid.api import plaid_api
-from plaid.model.link_token_create_request import LinkTokenCreateRequest, LinkTokenCreateRequestUser
-from plaid.model.link_token_transactions import LinkTokenTransactions
+import plaid
+from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
-from plaid.model.link_token_create_response import LinkTokenCreateResponse
-from plaid import Configuration, ApiClient
-
+from plaid.api import plaid_api
 
 
 
 app = FastAPI(title="Personal CFO API")
+
 
 
 client_id = os.getenv('PLAID_CLIENT_ID')
@@ -26,14 +25,16 @@ plaid_secret = os.getenv('PLAID_SECRET')
 application_name = "PERSONAL_CFO"
 
 
-configuration = Configuration(
-    host="https://sandbox.plaid.com", 
+
+configuration = plaid.Configuration(
+    host="https://sandbox.plaid.com",    
     api_key={
         'clientId': client_id,
         'secret': plaid_secret,
+        'plaidVersion': '2020-09-14'
     }
 )
-api_client = ApiClient(configuration)
+api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(api_client)
 
 
@@ -68,12 +69,17 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 class UserSettings(BaseModel):
-    language: str,
+    client_user_id: str
+    language: str
     phone_num: Optional[str] = None
 
+    model_config = {
+        "from-attributes": True
+    }
 
-@app.get("/link-token")
-def create_link_token(client_user_id: str, user_settings: UserSettings):
+
+@app.post("/link-token")
+def create_link_token(user_settings: UserSettings):
     # hit create link token on plain
 
     # Account filtering isn't required here, but sometimes 
@@ -81,22 +87,21 @@ def create_link_token(client_user_id: str, user_settings: UserSettings):
 
     request = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
-            client_user_id=client_user_id,
+            client_user_id= user_settings.client_user_id,
             phone_number= user_settings.phone_num
         ),
         client_name=application_name,
         products=[Products('transactions')],
-        transactions=LinkTokenTransactions(
-            days_requested=730
-        ),
         country_codes=[CountryCode('US')],
-        language= user_settings.lang,
-        webhook='https://sample-web-hook.com',
-        redirect_uri='https://domainname.com/oauth-page.html',
+        language= user_settings.language,
+
     )
 
     # create link token
     response = client.link_token_create(request)
+    print(response)
     link_token = response['link_token']
 
     return link_token
+
+    
