@@ -125,8 +125,6 @@ def exchange_public_token(payload: PublicTokenRequest):
     )
     response = client.item_public_token_exchange(request)
 
-    # These values should be saved to a persistent database and
-    # associated with the currently signed-in user
     access_token = response['access_token']
     item_id = response['item_id']
 
