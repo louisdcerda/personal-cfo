@@ -1,48 +1,104 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from typing import Optional
-from plaid.model import (
-    LinkTokenCreateRequest, LinkTokenCreateRequestUser,
-    Products, CountryCode, ItemPublicTokenExchangeRequest
-)
-from ...core.plaid_client import plaid_client
-from ...core.config import settings
+import os
 
+# ───────────────── Plaid SDK imports ──────────────────
+from plaid import Configuration, ApiClient
+from plaid.api import plaid_api
+from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
+from plaid.model.products import Products
+from plaid.model.country_code import CountryCode
+from plaid.model.item_public_token_exchange_request import (
+    ItemPublicTokenExchangeRequest,
+)
+
+# ───────────────── App settings ───────────────────────
+try:
+    # if you have a central settings module:
+    from ...core.config import settings  # type: ignore
+
+    PLAID_CLIENT_ID = settings.plaid_client_id
+    PLAID_SECRET = settings.plaid_secret
+    PLAID_ENV = settings.plaid_env
+    APP_NAME = settings.app_name
+except ImportError:
+    # fallback to raw env vars
+    PLAID_CLIENT_ID = os.getenv("PLAID_CLIENT_ID", "")
+    PLAID_SECRET = os.getenv("PLAID_SECRET", "")
+    PLAID_ENV = os.getenv("PLAID_ENV", "sandbox")
+    APP_NAME = os.getenv("APP_NAME", "Personal CFO")
+
+_HOSTS = {
+    "sandbox": "https://sandbox.plaid.com",
+    "development": "https://development.plaid.com",
+    "production": "https://production.plaid.com",
+}
+configuration = Configuration(
+    host=_HOSTS.get(PLAID_ENV, _HOSTS["sandbox"]),
+    api_key={
+        "clientId": PLAID_CLIENT_ID,
+        "secret": PLAID_SECRET,
+        "plaidVersion": "2020-09-14",
+    },
+)
+plaid_client = plaid_api.PlaidApi(ApiClient(configuration))
+
+# ───────────────── FastAPI router ─────────────────────
 router = APIRouter(prefix="/plaid", tags=["plaid"])
 
 
-# models
 class UserSettings(BaseModel):
     client_user_id: str
     language: str
     phone_num: Optional[str] = None
+
+    model_config = {"from_attributes": True}  # Pydantic v2
 
 
 class PublicTokenRequest(BaseModel):
     public_token: str
 
 
-# endpoints 
 @router.post("/link-token")
 def create_link_token(user_settings: UserSettings):
+    """Return a short-lived Plaid Link token to the frontend."""
     req = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
             client_user_id=user_settings.client_user_id,
             phone_number=user_settings.phone_num,
         ),
-        client_name=settings.app_name,
+        client_name=APP_NAME,
         products=[Products("transactions")],
         country_codes=[CountryCode("US")],
         language=user_settings.language,
     )
-    resp = plaid_client.link_token_create(req)
-    
-    return {"link_token": resp["link_token"]}
+
+    try:
+        resp = plaid_client.link_token_create(req)
+        return {"link_token": resp["link_token"]}
+    except Exception as e:  # pragma: no cover
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Plaid link_token_create failed: {e}",
+        ) from e
 
 
 @router.post("/exchange-public-token")
 def exchange_public_token(payload: PublicTokenRequest):
+    """
+    Exchange the public_token received from the client for a permanent
+    access_token + item_id. Persist access_token in your DB.
+    """
     req = ItemPublicTokenExchangeRequest(public_token=payload.public_token)
-    resp = plaid_client.item_public_token_exchange(req)
 
-    return {"item_id": resp["item_id"]}
+    try:
+        resp = plaid_client.item_public_token_exchange(req)
+        # TODO: save resp["access_token"] for the authenticated user
+        return {"item_id": resp["item_id"]}
+    except Exception as e:  # pragma: no cover
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Plaid item_public_token_exchange failed: {e}",
+        ) from e
