@@ -14,9 +14,7 @@ import os
 
 
 
-# ───────────────── App settings ───────────────────────
 try:
-    # if you have a central settings module:
     from ...core.config import settings  
 
     PLAID_CLIENT_ID = settings.plaid_client_id
@@ -45,7 +43,6 @@ configuration = Configuration(
 )
 plaid_client = plaid_api.PlaidApi(ApiClient(configuration))
 
-# ───────────────── FastAPI router ─────────────────────
 router = APIRouter(prefix="/plaid", tags=["plaid"])
 
 
@@ -63,7 +60,7 @@ class PublicTokenRequest(BaseModel):
 
 @router.post("/link-token")
 def create_link_token(user_settings: UserSettings):
-    """Return a short-lived Plaid Link token to the frontend."""
+    """link token needed for personal access token. sent to the client app"""
     req = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
             client_user_id=user_settings.client_user_id,
@@ -88,8 +85,8 @@ def create_link_token(user_settings: UserSettings):
 @router.post("/exchange-public-token")
 def exchange_public_token(payload: PublicTokenRequest):
     """
-    Exchange the public_token received from the client for a permanent
-    access_token + item_id. Persist access_token in your DB.
+    exchange the public_token received from the client for a permanent
+    access_token + item_id. Persist access_token in your DB. For right now do nothing.
     """
     req = ItemPublicTokenExchangeRequest(public_token=payload.public_token)
 
