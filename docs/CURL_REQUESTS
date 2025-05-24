@@ -1,0 +1,13 @@
+# CURL TEST REQUESTS
+
+to test link-token creation
+curl -X POST http://localhost:8000/link-token \
+  -H "Content-Type: application/json" \
+  -d '{"client_user_id": "abc123", "language": "en", "phone_num": "1234567890"}'
+
+
+
+to test exchange public token 
+curl -X POST http://localhost:8000/exchange-public-token \
+  -H "Content-Type: application/json" \
+  -d '{"public_token": "your-public-token-here"}'
