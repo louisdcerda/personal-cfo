@@ -75,6 +75,7 @@ def create_link_token(user_settings: UserSettings):
     try:
         resp = plaid_client.link_token_create(req)
         return {"link_token": resp["link_token"]}
+
     except Exception as e:  # pragma: no cover
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
