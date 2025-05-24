@@ -32,9 +32,10 @@ services:
     build: ./frontend
     container_name: personal-cfo-frontend
     depends_on:
-      - backend
+      - api
     ports:
       - "5173:80"          # browser hits localhost:5173
     restart: unless-stopped
+    
 volumes:
   db_data:
