@@ -1,8 +1,8 @@
-# Spending-Coach 🚀
+# Peronsal CFO
 AI-powered, real-time budgeting for busy people.
 
 > **One-liner**  
-> “Connect your bank in 30 seconds and get a daily chat message that tells you exactly what to adjust to stay on budget.”
+> “Connect your bank in 30 seconds and get a daily chat message that tells you exactly what to adjust to stay on budget”
 
 ---
 
