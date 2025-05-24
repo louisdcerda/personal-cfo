@@ -1,9 +1,3 @@
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
-from typing import Optional
-import os
-
-# ───────────────── Plaid SDK imports ──────────────────
 from plaid import Configuration, ApiClient
 from plaid.api import plaid_api
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
@@ -13,11 +7,17 @@ from plaid.model.country_code import CountryCode
 from plaid.model.item_public_token_exchange_request import (
     ItemPublicTokenExchangeRequest,
 )
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel
+from typing import Optional
+import os
+
+
 
 # ───────────────── App settings ───────────────────────
 try:
     # if you have a central settings module:
-    from ...core.config import settings  # type: ignore
+    from ...core.config import settings  
 
     PLAID_CLIENT_ID = settings.plaid_client_id
     PLAID_SECRET = settings.plaid_secret
@@ -102,3 +102,4 @@ def exchange_public_token(payload: PublicTokenRequest):
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Plaid item_public_token_exchange failed: {e}",
         ) from e
+``
