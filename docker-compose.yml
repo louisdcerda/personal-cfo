@@ -27,6 +27,14 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
+  
+  frontend:
+    build: ./frontend
+    container_name: personal-cfo-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"          # browser hits localhost:5173
+    restart: unless-stopped
 volumes:
   db_data:
