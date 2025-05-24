@@ -1,11 +1,3 @@
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from . import database, crud, schemas
-from pydantic import BaseModel
-from typing import Optional
-import os
-
 # plaid imports 
 import plaid
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
@@ -13,6 +5,14 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 from plaid.api import plaid_api
+
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from . import database, crud, schemas
+from pydantic import BaseModel
+from typing import Optional
+import os
 
 
 
