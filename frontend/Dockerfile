@@ -9,9 +9,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npm install react-router-dom
-
-RUN npm install react-plaid-link
+RUN npm install react-router-dom react-plaid-link
 
 
 RUN npm run build
