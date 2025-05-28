@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import SocialButton from '../components/SocialButton';
 import PlaidLinkButton from '../components/PlaidLinkButton';
 import './SignUpPage.css';
 
 const SignUpPage = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      // redirect or show success
+      await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      // on success
     } catch (err) {
       console.error('Signup failed:', err);
     }
@@ -34,6 +27,10 @@ const SignUpPage = () => {
         <Input label="Password" name="password" type="password" value={form.password} onChange={handleChange} required />
         <Button type="submit">Sign Up</Button>
       </form>
+      <div className="social-signup">
+        <SocialButton provider="google" onClick={() => {/* handle OAuth */}} />
+        <SocialButton provider="facebook" onClick={() => {/* handle OAuth */}} />
+      </div>
       <h3>Link Your Bank</h3>
       <PlaidLinkButton />
     </div>
@@ -41,4 +38,3 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
-

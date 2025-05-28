@@ -18,7 +18,7 @@ const PlaidLinkButton = () => {
     createToken();
   }, []);
 
-  const onSuccess = useCallback((public_token, metadata) => {
+  const onSuccess = useCallback((public_token) => {
     fetch('/api/set_access_token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
