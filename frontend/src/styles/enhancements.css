@@ -1,0 +1,32 @@
+:root {
+    --color-bg: #f9f9f9;
+    --color-text: #333;
+    --color-primary: #4F46E5;
+    --color-accent: #8b5cf6;
+    --gradient: linear-gradient(135def, #6366f1 0%, #8b5cf6 100%);
+}
+
+[data-theme="dark"] {
+    --color-bg: #1f2937;
+    --color-text: #f3f4f6;
+    --color-primary: #6366f1;
+    --color-accent: #8b5cf6;
+}
+
+html, body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: background 0.3s, color 0.3s;
+}
+
+a .btn, .animated-btn {
+    background: var(--gradient);
+}
+
+.theme-toggle {
+    font-size: 1.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 1rem;
+}

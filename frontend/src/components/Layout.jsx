@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Layout.css';
+import ThemeToggle from './ThemeToggle';
 
 const Layout = ({ children }) => (
   <div className="app-container">
@@ -11,6 +12,7 @@ const Layout = ({ children }) => (
         <Link to="/signup">Sign Up</Link>
         <Link to="/signin">Sign In</Link>
       </nav>
+      <ThemeToggle />
     </header>
     <main className="main-content">
       {children}
