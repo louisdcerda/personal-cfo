@@ -12,6 +12,9 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // ...your signup logic
+
+
+    // sign up 
   };
 
   return (
