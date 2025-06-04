@@ -100,4 +100,3 @@ def exchange_public_token(payload: PublicTokenRequest):
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Plaid item_public_token_exchange failed: {e}",
         ) from e
-``

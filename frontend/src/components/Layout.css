@@ -1,37 +1,69 @@
+/* =============================================================================
+   Layout.css – Modified for a Monet Lily‐Pad Palette on White Background
+   ============================================================================= */
+
+/* Base reset and body */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #ffffff;    /* Pure white canvas */
+  color: #344E41;               /* Deep muted green for text */
+}
+
+/* App container flex‐wrapper */
 .app-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  .header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .header .logo {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #4F46E5;
-  }
-  .header nav a {
-    margin-left: 1.5rem;
-    font-size: 1rem;
-    color: #4B5563;
-  }
-  .header nav a:hover {
-    color: #1F2937;
-  }
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-  }
-  .footer {
-    background-color: #f3f4f6;
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.875rem;
-    color: #6B7280;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* NAVBAR / HEADER */
+.header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #DDE5DD;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;            /* sticks to top on scroll */
+  top: 0;
+  z-index: 100;
+}
+
+/* Logo (left) */
+.header .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #50723E;              /* Darker lily‐pad green */
+}
+
+/* NAV LINKS (right) */
+.header nav a {
+  margin-left: 1.5rem;
+  font-size: 1rem;
+  color: #50723E;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.header nav a:hover {
+  background-color: #DDE5DD;   /* Very pale green hover */
+  color: #2F4F2F;              /* Even darker on hover */
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+  flex: 1;
+  padding: 2rem 2rem;
+}
+
+/* FOOTER */
+.footer {
+  background-color: #F0F5F1;    /* Very light green‐white */
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #50723E;
+}
