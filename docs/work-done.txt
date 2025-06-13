@@ -1,0 +1,18 @@
+change the count button to hit the link token route and get that token 
+
+get that token then do something with it --> look at plaid docs for oath stuff
+
+exchange for public access token 
+
+
+simple thing to do for tmrw (5/24)
+
+
+
+make one global client so we dont have to recbuild 
+
+
+
+june 5
+creating the route api call for the sign up date 
+
