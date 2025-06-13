@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-
 from ..deps import get_db
 from ..utils import hash_password, verify_password
 from app.models import User
@@ -46,12 +45,24 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
+def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_access_token(data={"sub": db_user.email})
+    # get client info
+    ip = request.client.host
+    user_agent = request.headers.get("user-agent", "")
+
+    # create persistent session
+    session = create_user_session(db, db_user.id, ip, user_agent)
+
     response = JSONResponse(content={"message": "Login successful"})
-    response.set_cookie("access_token", token, httponly=True)
+    response.set_cookie(
+        key="session_token",
+        value=session.session_token,
+        httponly=True,
+        max_age=3600,
+        samesite="Lax"
+    )
     return response
