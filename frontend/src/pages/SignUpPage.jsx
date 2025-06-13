@@ -13,8 +13,34 @@ const SignUpPage = () => {
     e.preventDefault();
     // ...your signup logic
 
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert("Error $(errorData.message || 'Signup fialed");
+        return;
+      }
 
-    // sign up 
+      const data = await response.json();
+
+      localStorage.setItem('token', data.token);
+
+      window.location.href = '/signup';
+
+
+    } catch (error)
+    {
+      console.error("Signup error: ", error);
+      alert("Something went wrong. Please try again later");
+    }
+    
   };
 
   return (
