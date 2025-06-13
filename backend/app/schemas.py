@@ -85,6 +85,11 @@ class UserSettingRead(UserSettingBase):
     class Config:
         orm_mode = True
 
+class UserLogin(BaseModel):
+    email:EmailStr
+    password: str
+    
+
 
 #
 # 4) BANK ACCOUNT (PLAID) + TRANSACTIONS
