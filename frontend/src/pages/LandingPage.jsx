@@ -52,7 +52,7 @@ const LandingPage = () => {
         </div>
         <div className="feature-image">
           <img
-            src="/images/feature-budget.png"
+            src="/images/business-man-thinking-of-several-options-svgrepo-com.svg"
             alt="Budget Charts"
             loading="lazy"
           />
@@ -63,7 +63,7 @@ const LandingPage = () => {
       <div className="feature-row alt">
         <div className="feature-image">
           <img
-            src="/images/feature-invest.png"
+            src="/images/data-analysis-svgrepo-com.svg"
             alt="Investment Dashboard"
             loading="lazy"
           />
@@ -90,7 +90,7 @@ const LandingPage = () => {
         </div>
         <div className="feature-image">
           <img
-            src="/images/feature-report.png"
+            src="/images/financial-report-svgrepo-com.svg"
             alt="Financial Report"
             loading="lazy"
           />

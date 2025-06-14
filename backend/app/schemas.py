@@ -1,28 +1,37 @@
+# app/schemas.py
+
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
+#
+# ========== 1) AUTH / USER SCHEMAS ==========
+#
 
-#
-# 1) AUTH / USER SCHEMAS
-#
 class UserBase(BaseModel):
     email: EmailStr
     full_name: Optional[str] = None
 
 
 class UserCreate(UserBase):
-    password: str   # Plain‐text in schema; hash on server side
+    name: str
+    password: str
 
 
 class UserRead(UserBase):
     id: int
+    name: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class AuthTokenBase(BaseModel):
@@ -36,12 +45,13 @@ class AuthTokenRead(AuthTokenBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 2) OAUTH / SOCIAL LOGIN
+# ========== 2) OAUTH / SOCIAL LOGIN ==========
 #
+
 class OAuthAccountBase(BaseModel):
     provider_name: str
     provider_user_id: str
@@ -61,15 +71,16 @@ class OAuthAccountRead(OAuthAccountBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 3) USER SETTINGS
+# ========== 3) USER SETTINGS ==========
 #
+
 class UserSettingBase(BaseModel):
     key: str
-    value: Dict[str, Any]   # store any JSON‐serializable object
+    value: Dict[str, Any]
 
 
 class UserSettingCreate(UserSettingBase):
@@ -83,17 +94,13 @@ class UserSettingRead(UserSettingBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
-
-class UserLogin(BaseModel):
-    email:EmailStr
-    password: str
-    
+        from_attributes = True
 
 
 #
-# 4) BANK ACCOUNT (PLAID) + TRANSACTIONS
+# ========== 4) BANK ACCOUNTS & TRANSACTIONS ==========
 #
+
 class BankAccountBase(BaseModel):
     plaid_account_id: str
     institution_name: Optional[str] = None
@@ -119,7 +126,7 @@ class BankAccountRead(BankAccountBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TransactionBase(BaseModel):
@@ -144,12 +151,13 @@ class TransactionRead(TransactionBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 5) CATEGORIES & BUDGETS
+# ========== 5) CATEGORIES & BUDGETS ==========
 #
+
 class CategoryBase(BaseModel):
     name: str
     parent_id: Optional[int] = None
@@ -166,7 +174,7 @@ class CategoryRead(CategoryBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class BudgetBase(BaseModel):
@@ -185,10 +193,10 @@ class BudgetRead(BudgetBase):
     user_id: int
     created_at: datetime
     updated_at: datetime
-    items: List["BudgetItemRead"] = []  # forward reference
+    items: List["BudgetItemRead"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class BudgetItemBase(BaseModel):
@@ -207,15 +215,16 @@ class BudgetItemRead(BudgetItemBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 BudgetRead.update_forward_refs()
 
 
 #
-# 6) INVESTMENTS
+# ========== 6) INVESTMENTS ==========
 #
+
 class InvestmentAccountBase(BaseModel):
     broker_name: str
     account_mask: Optional[str] = None
@@ -235,7 +244,7 @@ class InvestmentAccountRead(InvestmentAccountBase):
     holdings: List["InvestmentHoldingRead"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class InvestmentHoldingBase(BaseModel):
@@ -257,15 +266,16 @@ class InvestmentHoldingRead(InvestmentHoldingBase):
     raw_holding_data: Optional[Dict[str, Any]] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 InvestmentAccountRead.update_forward_refs()
 
 
 #
-# 7) FINANCIAL REPORTS
+# ========== 7) FINANCIAL REPORTS ==========
 #
+
 class FinancialReportBase(BaseModel):
     period_start: datetime
     period_end: datetime
@@ -285,12 +295,13 @@ class FinancialReportRead(FinancialReportBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 8) PASSWORD RESETS
+# ========== 8) PASSWORD RESETS ==========
 #
+
 class PasswordResetBase(BaseModel):
     expires_at: datetime
 
@@ -306,12 +317,13 @@ class PasswordResetRead(PasswordResetBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 9) AUDIT LOGS
+# ========== 9) AUDIT LOGS ==========
 #
+
 class AuditLogBase(BaseModel):
     event_type: str
     event_details: Optional[Dict[str, Any]] = None
@@ -327,12 +339,13 @@ class AuditLogRead(AuditLogBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #
-# 10) USER SESSIONS
+# ========== 10) USER SESSIONS ==========
 #
+
 class UserSessionBase(BaseModel):
     user_agent: Optional[str] = None
     ip_address: Optional[str] = None
@@ -350,4 +363,4 @@ class UserSessionRead(UserSessionBase):
     last_active_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

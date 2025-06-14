@@ -42,3 +42,21 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
 
     return session.user
     
+def create_user_session(db: Session, user_id: int, ip: str, user_agent: str) -> UserSession:
+    session_token = secrets.token_urlsafe(64)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+
+    session = UserSession(
+        user_id=user_id,
+        session_token=session_token,
+        ip_address=ip,
+        user_agent=user_agent,
+        expires_at=expires_at,
+        last_active_at=datetime.utcnow()
+    )
+
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+
+    return session
