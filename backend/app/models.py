@@ -279,6 +279,19 @@ class AuditLog(Base):
     user = relationship("User", back_populates="audit_logs")
 
 
+class PlaidItem(Base):
+    __tablename__ = "plaid_items"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    access_token = Column(String(512), nullable=False)
+    item_id = Column(String(255), nullable=False)
+    institution_id = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now, nullable=False)
+    
+    user = relationship("User", backref="plaid_items")
+
+
 class UserSession(Base):
     __tablename__ = "user_sessions"
 

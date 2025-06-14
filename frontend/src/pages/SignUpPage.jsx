@@ -1,46 +1,48 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './SignUpPage.css';
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError(''); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // ...your signup logic
+    setIsLoading(true);
+    setError('');
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('/api/users/signup', {
         method: 'POST',
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(form),
       });
       
+      const data = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        alert("Error $(errorData.message || 'Signup fialed");
-        return;
+        throw new Error(data.detail || 'Signup failed');
       }
 
-      const data = await response.json();
-
+      // Store token and redirect to dashboard
       localStorage.setItem('token', data.token);
+      navigate('/dashboard');
 
-      window.location.href = '/signup';
-
-
-    } catch (error)
-    {
-      console.error("Signup error: ", error);
-      alert("Something went wrong. Please try again later");
+    } catch (error) {
+      setError(error.message || 'Something went wrong. Please try again later.');
+      console.error("Signup error:", error);
+    } finally {
+      setIsLoading(false);
     }
-    
   };
 
   return (
@@ -53,8 +55,9 @@ const SignUpPage = () => {
       </div>
 
       {/* SIGN UP FORM PANEL */}
+      <h2>Create Account</h2>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit} className="signup-form">
-        <h2>Create Your Account</h2>
         <div className="input-group">
           <label>Name</label>
           <input
@@ -88,20 +91,25 @@ const SignUpPage = () => {
             required
           />
         </div>
-        <button type="submit">Sign Up</button>
-
-        {/* OPTIONAL SOCIAL SIGNUP */}
-        <div className="social-signup">
-          <button className="social-btn">Sign up with Google</button>
-          <button className="social-btn">Sign up with Facebook</button>
-        </div>
-
-        {/* OPTIONAL “LINK YOUR BANK” HEADING */}
-        <div className="link-wrapper">
-          <h3>Link Your Bank</h3>
-          {/* Insert PlaidLinkButton here if desired */}
-        </div>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Creating Account...' : 'Sign Up'}
+        </button>
       </form>
+      <p className="login-link">
+        Already have an account? <Link to="/signin">Sign In</Link>
+      </p>
+
+      {/* OPTIONAL SOCIAL SIGNUP */}
+      <div className="social-signup">
+        <button className="social-btn">Sign up with Google</button>
+        <button className="social-btn">Sign up with Facebook</button>
+      </div>
+
+      {/* OPTIONAL "LINK YOUR BANK" HEADING */}
+      <div className="link-wrapper">
+        <h3>Link Your Bank</h3>
+        {/* Insert PlaidLinkButton here if desired */}
+      </div>
     </div>
   );
 };
