@@ -14,7 +14,8 @@ import os
 from sqlalchemy.orm import Session
 from app.deps import get_db
 from app.core.auth import get_current_user
-from app.models import PlaidItem
+from app.models import User, PlaidItem
+
 
 
 
