@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import './SignUpPage.css';
 
 const SignUpPage = () => {
@@ -21,22 +22,17 @@ const SignUpPage = () => {
     try {
       const response = await fetch('/api/users/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || 'Signup failed');
-      }
+      if (!response.ok) throw new Error(data.detail || 'Signup failed');
 
       localStorage.setItem('token', data.token);
       navigate('/dashboard');
     } catch (error) {
-      setError(error.message || 'Something went wrong. Please try again later.');
+      setError(error.message || 'Something went wrong.');
       console.error('Signup error:', error);
     } finally {
       setIsLoading(false);
@@ -45,55 +41,51 @@ const SignUpPage = () => {
 
   return (
     <div className="signup-page">
-      <div className="navbar">
-        <Link to="/">Home</Link>
-        <Link to="/signup">Sign Up</Link>
-        <Link to="/signin">Sign In</Link>
-      </div>
 
-      <h2>Create Account</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit} className="signup-form">
-        <div className="input-group">
-          <label>Full Name</label>
-          <input
-            name="full_name"
-            type="text"
-            placeholder="Enter your name"
-            value={form.full_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="input-group">
-          <label>Email</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="input-group">
-          <label>Password</label>
-          <input
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Creating Account...' : 'Sign Up'}
-        </button>
-      </form>
-      <p className="login-link">
-        Already have an account? <Link to="/signin">Sign In</Link>
-      </p>
+
+
+      <div className="form-container">
+        <h2>Create your account</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <label>
+            Full Name
+            <input
+              name="full_name"
+              type="text"
+              value={form.full_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label>
+            Email
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label>
+            Password
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
+        <p>
+          Already have an account? <Link to="/signin">Sign In</Link>
+        </p>
+      </div>
     </div>
   );
 };

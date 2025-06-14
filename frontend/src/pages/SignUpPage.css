@@ -1,235 +1,134 @@
-/* =============================================================================
-   SignUpPage.css – Futuristic / Innovative Theme
-   ============================================================================= */
-
-/* Variables for neon‐style accents */
 :root {
-  --bg-gradient-start: #0f0c29;
-  --bg-gradient-end:   #302b63;
-  --panel-bg:          rgba(0, 0, 0, 0.6);
-  --input-bg:          rgba(255, 255, 255, 0.1);
-  --input-border:      #00e5ff;
-  --input-placeholder: rgba(255, 255, 255, 0.6);
-  --button-bg:         #00e5ff;
-  --button-hover:      #00c5e5;
-  --button-text:       #0f0c29;
-  --link-color:        #ffffff;
-  --link-hover:        #00e5ff;
-  --font-color:        #e0e0e0;
+  --primary: #6c4dbf; /* deep purple */
+  --accent: #b197fc;  /* soft lavender */
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #666666;
+  --border: #e6e6e6;
 }
 
-/* Full‐page gradient background */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
 .signup-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    var(--bg-gradient-start) 0%,
-    var(--bg-gradient-end)   100%
-  );
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--font-color);
   padding: 2rem 1rem;
+  background-color: var(--bg);
 }
 
-/* Centered form panel with translucent “glass” effect */
-.signup-page .signup-form,
-.signup-page .social-signup,
-.signup-page .link-wrapper {
+.navbar {
   width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.signup-page .signup-form {
-  background: var(--panel-bg);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: fadeIn 0.8s ease-out forwards;
-}
-
-/* Heading */
-.signup-page h2 {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  letter-spacing: 1px;
-  color: #ffffff;
-  text-transform: uppercase;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-}
-
-/* Input group styling */
-.signup-page .input-group {
-  position: relative;
-  margin-bottom: 1.5rem;
-}
-
-.signup-page .input-group label {
-  position: absolute;
-  top: -0.75rem;
-  left: 0.75rem;
-  background: var(--panel-bg);
-  padding: 0 0.25rem;
-  font-size: 0.875rem;
-  color: var(--font-color);
-  pointer-events: none;
-  transition: color 0.3s ease;
-}
-
-.signup-page .input-group input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #ffffff;
-  outline: none;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-.signup-page .input-group input::placeholder {
-  color: var(--input-placeholder);
-}
-
-.signup-page .input-group input:focus {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 8px var(--input-border);
-}
-
-.signup-page .input-group input:focus + label {
-  color: var(--input-border);
-}
-
-/* Submit button */
-.signup-page .signup-form button[type="submit"] {
-  width: 100%;
-  background: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 229, 255, 0.6);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 0.5rem;
-}
-
-.signup-page .signup-form button[type="submit"]:hover {
-  background: var(--button-hover);
-  box-shadow: 0 6px 24px rgba(0, 229, 255, 0.8);
-}
-
-/* Social signup buttons container */
-.signup-page .social-signup {
   display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  animation: fadeIn 1s 0.5s ease-out forwards;
-  opacity: 0; /* start hidden, fadeIn will bring to 1 */
-}
-
-.signup-page .social-btn {
-  flex: 1;
-  text-align: center;
-  background: linear-gradient(135deg, #00e5ff 0%, #00c5e5 100%);
-  color: #0f0c29;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 229, 255, 0.4);
-}
-
-.signup-page .social-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 229, 255, 0.6);
-}
-
-/* “Link Your Bank” heading (optional if you want it) */
-.signup-page .link-wrapper {
-  margin-top: 2rem;
-  text-align: center;
-  animation: fadeIn 1s 1s ease-out forwards;
-  opacity: 0;
-}
-
-.signup-page .link-wrapper h3 {
-  font-size: 1.25rem;
-  color: #ffffff;
-  margin-bottom: 1rem;
-}
-
-/* Navigation links at top */
-.signup-page .navbar {
+  justify-content: flex-end;
+  padding: 1.5rem 2rem 0 2rem;
   position: absolute;
-  top: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background: transparent;
+}
+
+.nav-links {
   display: flex;
   gap: 2rem;
-  z-index: 10;
 }
 
-.signup-page .navbar a {
-  color: var(--link-color);
-  font-size: 1rem;
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
   font-weight: 500;
-  text-transform: uppercase;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
-.signup-page .navbar a:hover {
-  color: var(--link-hover);
+.nav-links a:hover,
+.nav-links .active {
+  color: var(--primary);
 }
 
-/* Fade‐in keyframe */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.form-container {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
-/* Mobile responsive tweaks */
-@media screen and (max-width: 480px) {
-  .signup-page .signup-form {
-    padding: 1.5rem;
-  }
+h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+}
 
-  .signup-page h2 {
-    font-size: 1.75rem;
-  }
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
 
-  .signup-page .social-signup {
-    flex-direction: column;
-  }
+input {
+  width: 100%;
+  padding: 0.7rem;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
+}
 
-  .signup-page .social-btn {
-    width: 100%;
-  }
+input:focus {
+  border-color: var(--primary);
+  outline: none;
+  background-color: #fff;
+}
 
-  .signup-page .navbar {
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
+button {
+  width: 100%;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #007a57;
+}
+
+.error-message {
+  background-color: #ffe6e6;
+  color: var(--accent);
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+p {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+p a {
+  color: var(--primary);
+  text-decoration: none;
 }

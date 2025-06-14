@@ -44,30 +44,34 @@ const SignInPage = () => {
 
   return (
     <div className="signin-page">
-      <h2>Welcome Back</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit} className="signin-form">
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          value={credentials.email}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          label="Password"
-          name="password"
-          type="password"
-          value={credentials.password}
-          onChange={handleChange}
-          required
-        />
-        <Link to="/forgot-password" className="forgot-link">Forgot Password?</Link>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Signing In...' : 'Sign In'}
-        </Button>
-      </form>
+      <div className="form-container">
+        <h2>Welcome Back</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="signin-form">
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            value={credentials.email}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            value={credentials.password}
+            onChange={handleChange}
+            required
+          />
+          <div className="form-footer">
+            <Link to="/forgot-password" className="forgot-link">Forgot Password?</Link>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
