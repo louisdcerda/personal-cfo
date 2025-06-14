@@ -1,10 +1,58 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from ..deps import get_db
-from ... import crud, schemas
+from ..utils import hash_password, verify_password
+from app.models import User, UserSession
+from app.core.auth import create_access_token, create_user_session
+from app.schemas import UserCreate, UserRead, UserLogin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.post("/", response_model=schemas.UserRead)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db, user)
+@router.post("/signup", response_model=UserRead)
+def user_signup(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User already signed up with this email"
+        )
+
+    hashed_password = hash_password(user.password)
+
+    new_user = User(
+        full_name=user.full_name,
+        email=user.email,
+        password_hash=hashed_password
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    token = create_access_token(data={"sub": new_user.email})
+    response = JSONResponse(content={"message": "User created"})
+    response.set_cookie("access_token", token, httponly=True)
+
+    return response
+
+
+@router.post("/login")
+def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user.email).first()
+    if not db_user or not verify_password(user.password, db_user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    ip = request.client.host
+    user_agent = request.headers.get("user-agent", "")
+    session = create_user_session(db, db_user.id, ip, user_agent)
+
+    response = JSONResponse(content={"message": "Login successful"})
+    response.set_cookie(
+        key="session_token",
+        value=session.session_token,
+        httponly=True,
+        max_age=3600,
+        samesite="Lax"
+    )
+    return response

@@ -7,19 +7,18 @@ const LandingPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // send email to your signup API or redirect to /signup?email=…
+    // TODO: connect to signup flow or capture email
     console.log('Submitted email:', email);
   };
 
   return (
-    <div className="landing-netflix">
-      {/* HERO (full-screen background) */}
-      <div className="hero-section">
-        <div className="hero-overlay" />
-        <div className="hero-content">
+    <div className="landing-container">
+      {/* HERO SECTION */}
+      <section className="hero-section">
+        <div className="hero-inner">
           <h1 className="hero-title">Take Control of Your Money</h1>
           <p className="hero-subtitle">
-            Every tool you need—budget tracking, insights, and more. All in one place.
+            All your finances—budget tracking, reports, and AI-powered insights—in one place.
           </p>
           <form className="email-form" onSubmit={handleSubmit}>
             <input
@@ -31,81 +30,73 @@ const LandingPage = () => {
               required
             />
             <button type="submit" className="email-button">
-              Get Started &rarr;
+              Get Started →
             </button>
           </form>
-          <p className="hero-note">
-            Ready in seconds. No credit card required.
-          </p>
+          <p className="hero-note">No credit card required. Ready in seconds.</p>
         </div>
-      </div>
+      </section>
 
-      {/* FEATURE ROW 1 */}
-      <div className="feature-row">
-        <div className="feature-text">
-          <h2>Smart Budget Tracking</h2>
-          <p>
-            Visualize your spending in real time, set custom alerts, and never
-            wonder where your money went. Our sleek, interactive charts help
-            you stay on top of every dollar.
-          </p>
+      {/* FEATURES */}
+      <section className="features">
+        <div className="feature-row">
+          <div className="feature-text">
+            <h2>Smart Budget Tracking</h2>
+            <p>
+              Visualize spending in real time, set alerts, and stay on top of your financial goals.
+            </p>
+          </div>
+          <div className="feature-image">
+            <img
+              src="/images/business-man-thinking-of-several-options-svgrepo-com.svg"
+              alt="Budget Tracking"
+              loading="lazy"
+            />
+          </div>
         </div>
-        <div className="feature-image">
-          <img
-            src="/images/feature-budget.png"
-            alt="Budget Charts"
-            loading="lazy"
-          />
-        </div>
-      </div>
 
-      {/* FEATURE ROW 2 (image left, text right) */}
-      <div className="feature-row alt">
-        <div className="feature-image">
-          <img
-            src="/images/feature-invest.png"
-            alt="Investment Dashboard"
-            loading="lazy"
-          />
+        <div className="feature-row alt">
+          <div className="feature-image">
+            <img
+              src="/images/data-analysis-svgrepo-com.svg"
+              alt="Investment Insights"
+              loading="lazy"
+            />
+          </div>
+          <div className="feature-text">
+            <h2>Data-Driven Investment Insights</h2>
+            <p>
+              Use AI to optimize your portfolio with adaptive recommendations and real-time metrics.
+            </p>
+          </div>
         </div>
-        <div className="feature-text">
-          <h2>Data-Driven Investment Insights</h2>
-          <p>
-            Use AI-powered analysis to optimize your portfolio. Track risk
-            metrics, compare performance, and get tailored recommendations that
-            adapt as markets change.
-          </p>
-        </div>
-      </div>
 
-      {/* FEATURE ROW 3 */}
-      <div className="feature-row">
-        <div className="feature-text">
-          <h2>Personalized Financial Reports</h2>
-          <p>
-            Receive monthly reports that break down your net worth, expenses,
-            and growth opportunities. Everything is designed to help you plan
-            ahead with confidence.
-          </p>
+        <div className="feature-row">
+          <div className="feature-text">
+            <h2>Personalized Reports</h2>
+            <p>
+              Get monthly summaries of your net worth, spending habits, and opportunities to grow.
+            </p>
+          </div>
+          <div className="feature-image">
+            <img
+              src="/images/financial-report-svgrepo-com.svg"
+              alt="Financial Reports"
+              loading="lazy"
+            />
+          </div>
         </div>
-        <div className="feature-image">
-          <img
-            src="/images/feature-report.png"
-            alt="Financial Report"
-            loading="lazy"
-          />
-        </div>
-      </div>
+      </section>
 
-      {/* FINAL CTA BANNER */}
-      <div className="final-cta">
+      {/* FINAL CTA */}
+      <section className="final-cta">
         <div className="cta-content">
           <h2>Ready to master your finances?</h2>
           <Link to="/signup">
             <button className="cta-button">Create Free Account</button>
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -7,13 +7,11 @@ import SignInPage from './pages/SignInPage';
 
 const App = () => (
   <Router>
-    <Layout>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/signin" element={<SignInPage />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      <Route path="/" element={<Layout><LandingPage /></Layout>} />
+      <Route path="/signup" element={<Layout><SignUpPage /></Layout>} />
+      <Route path="/signin" element={<Layout><SignInPage /></Layout>} />
+    </Routes>
   </Router>
 );
 

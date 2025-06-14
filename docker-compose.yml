@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  api:
+  backend:
     build: ./backend
     env_file: .env
     ports:
@@ -32,10 +32,14 @@ services:
     build: ./frontend
     container_name: personal-cfo-frontend
     depends_on:
-      - api
+      - backend
     ports:
-      - "5173:80"          # browser hits localhost:5173
+      - "5173:80"          
     restart: unless-stopped
     
 volumes:
   db_data:
+
+networks:
+  default:
+    name: personal_cfo_net

@@ -1,69 +1,82 @@
-/* =============================================================================
-   Layout.css – Modified for a Monet Lily‐Pad Palette on White Background
-   ============================================================================= */
-
-/* Base reset and body */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  background-color: #ffffff;    /* Pure white canvas */
-  color: #344E41;               /* Deep muted green for text */
-}
-
-/* App container flex‐wrapper */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* NAVBAR / HEADER */
 .header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #DDE5DD;
-  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;            /* sticks to top on scroll */
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #eee;
+  background-color: white;
+  position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
-/* Logo (left) */
-.header .logo {
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #00966c;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links .active {
+  color: #00966c;
+}
+
+/* Hamburger menu toggle button */
+.menu-toggle {
+  display: none;
   font-size: 1.5rem;
-  font-weight: bold;
-  color: #50723E;              /* Darker lily‐pad green */
+  background: none;
+  border: none;
+  color: #00966c;
+  cursor: pointer;
 }
 
-/* NAV LINKS (right) */
-.header nav a {
-  margin-left: 1.5rem;
-  font-size: 1rem;
-  color: #50723E;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s ease, color 0.2s ease;
+/* Mobile Styles */
+@media screen and (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    display: none;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
 }
 
-.header nav a:hover {
-  background-color: #DDE5DD;   /* Very pale green hover */
-  color: #2F4F2F;              /* Even darker on hover */
-}
-
-/* MAIN CONTENT AREA */
 .main-content {
-  flex: 1;
-  padding: 2rem 2rem;
+  padding: 2rem 1rem;
+  min-height: 80vh;
 }
 
-/* FOOTER */
 .footer {
-  background-color: #F0F5F1;    /* Very light green‐white */
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
   font-size: 0.875rem;
-  color: #50723E;
+  color: #999;
+  border-top: 1px solid #eee;
 }
