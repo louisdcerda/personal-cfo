@@ -36,6 +36,7 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
     return response
 
 
+
 @router.post("/login")
 def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
@@ -51,7 +52,15 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
         key="session_token",
         value=session.session_token,
         httponly=True,
+        secure=True,  # only over HTTPS
         max_age=3600,
         samesite="Lax"
     )
     return response
+
+
+
+# to test a protected route and make sure cookies are working 
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user)):
+    return {"email": current_user.email}

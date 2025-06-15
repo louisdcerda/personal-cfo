@@ -5,7 +5,7 @@ from app.core.config import settings
 from fastapi import Depends, HTTPException, Request, status
 from app.deps import get_db
 from sqlalchemy.orm import Session
-
+import secrets
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
