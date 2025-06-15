@@ -1,0 +1,155 @@
+:root {
+    --primary: #6c4dbf; /* deep purple */
+    --accent: #b197fc;  /* soft lavender */
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666666;
+    --border: #e6e6e6;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+  
+  /* Shared layout for both pages */
+  .signup-page,
+  .signin-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-color: var(--bg);
+  }
+  
+  /* Navigation Bar */
+  .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 1.5rem 2rem 0 2rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    background: transparent;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  .nav-links a:hover,
+  .nav-links .active {
+    color: var(--primary);
+  }
+  
+  /* Form container */
+  .form-container {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Headings */
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  /* Labels and Inputs */
+  label {
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  
+  input {
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 0.25rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    transition: all 0.2s ease;
+    color: var(--text);
+  }
+  
+  input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background-color: #fff;
+  }
+  
+  /* Buttons */
+  button {
+    width: 100%;
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #5637a5;
+  }
+  
+  /* Error message */
+  .error-message {
+    background-color: #ffe6e6;
+    color: var(--accent);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+  
+  /* Footer links */
+  .form-footer,
+  p {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  p a,
+  .forgot-link {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  
+  .forgot-link {
+    color: var(--muted);
+  }
+  
+  .forgot-link:hover {
+    color: var(--primary);
+  }
+  

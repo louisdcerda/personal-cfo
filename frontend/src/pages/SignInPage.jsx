@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import './SignInPage.css'; // Reuse the shared style, rename if needed
+import './AuthStyling.css'; 
 
 const SignInPage = () => {
   const navigate = useNavigate();

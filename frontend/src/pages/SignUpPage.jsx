@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import './SignUpPage.css';
+import './AuthStyling.css'; 
 
 const SignUpPage = () => {
   const navigate = useNavigate();
