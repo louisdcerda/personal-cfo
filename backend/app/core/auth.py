@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from app.models import UserSession
 from app.core.config import settings
@@ -7,9 +7,10 @@ from app.deps import get_db
 from sqlalchemy.orm import Session
 import secrets
 
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
@@ -31,20 +32,20 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
 
     session = db.query(UserSession).filter(UserSession.session_token == token).first()
 
-    if not session or session.expires_at < datetime.utcnow():
+    if not session or session.expires_at < datetime.now(timezone.utc):  
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Session expired or invalid"
         )
     
-    session.last_active_at = datetime.utcnow()
+    session.last_active_at = datetime.now(timezone.utc)
     db.commit()
 
     return session.user
     
 def create_user_session(db: Session, user_id: int, ip: str, user_agent: str) -> UserSession:
     session_token = secrets.token_urlsafe(64)
-    expires_at = datetime.utcnow() + timedelta(hours=1)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
 
     session = UserSession(
         user_id=user_id,
@@ -52,7 +53,7 @@ def create_user_session(db: Session, user_id: int, ip: str, user_agent: str) -> 
         ip_address=ip,
         user_agent=user_agent,
         expires_at=expires_at,
-        last_active_at=datetime.utcnow()
+        last_active_at=datetime.now(timezone.utc)
     )
 
     db.add(session)

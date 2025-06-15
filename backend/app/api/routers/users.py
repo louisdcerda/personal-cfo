@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 from ..deps import get_db
 from ..utils import hash_password, verify_password
 from app.models import User, UserSession
-from app.core.auth import create_access_token, create_user_session
+from app.core.auth import create_access_token, create_user_session, get_current_user
 from app.schemas import UserCreate, UserRead, UserLogin
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
