@@ -10,11 +10,9 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: Optional[str] = None
 
 
 class UserCreate(UserBase):
-    full_name: str
     email: EmailStr
     password: str
 
