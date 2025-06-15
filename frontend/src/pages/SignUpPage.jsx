@@ -78,6 +78,16 @@ const SignUpPage = () => {
               required
             />
           </label>
+          <label>
+            Confirm Password
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </label>
           <button type="submit" disabled={isLoading}>
             {isLoading ? 'Signing up...' : 'Sign Up'}
           </button>
