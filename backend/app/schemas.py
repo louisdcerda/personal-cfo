@@ -17,16 +17,15 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserRead(UserBase):
+class UserRead(BaseModel):
     id: int
-    name: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    has_linked_bank: bool
 
     class Config:
-        from_attributes = True
-
+        from_attributes = True  
 
 class UserLogin(BaseModel):
     email: EmailStr

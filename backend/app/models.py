@@ -47,6 +47,7 @@ class User(Base):
     password_resets = relationship("PasswordReset", back_populates="user", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")
     user_sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
+    has_linked_bank = Column(Boolean, default=False, nullable=False)
 
 
 class AuthToken(Base):
