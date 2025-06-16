@@ -1,0 +1,29 @@
+/* styles/Dashboard.css */
+.dashboard {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.dashboard-card {
+  padding: 2rem 3rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  background: #f9f7ff;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.dashboard-card h1 {
+  color: #5e3fd7;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-card p {
+  color: #333;
+  font-size: 1rem;
+}
