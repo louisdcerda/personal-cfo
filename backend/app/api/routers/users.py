@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy.orm import Session
 from ..deps import get_db
 from ..utils import hash_password, verify_password
@@ -34,10 +34,10 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
     # Generate JWT token
     token = create_access_token(data={"sub": new_user.email})
 
-    # Return response with cookie and serialized data
+    # Serialize user data
     response_data = UserRead.model_validate(new_user)
 
-    from fastapi.responses import Response
+    # Return JSON response with token as httponly cookie
     response = Response(
         content=response_data.model_dump_json(),
         media_type="application/json"
@@ -56,9 +56,12 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
     user_agent = request.headers.get("user-agent", "")
     session = create_user_session(db, db_user.id, ip, user_agent)
 
+    # Use Pydantic model to serialize datetime fields correctly
+    user_data = UserRead.model_validate(db_user).model_dump()
+
     response = JSONResponse(content={
         "message": "Login successful",
-        "user": UserRead.model_validate(db_user).dict(),  
+        "user": user_data
     })
     response.set_cookie(
         key="session_token",
@@ -73,4 +76,4 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserRead)
 def get_me(current_user: User = Depends(get_current_user)):
-    return UserRead.model_validate(current_user) 
+    return UserRead.model_validate(current_user)
