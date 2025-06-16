@@ -1,59 +1,98 @@
-// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
-import '../styles/Dashboard.css';
+import './Dashboard.css';
 
 const Dashboard = () => {
-  const [showPlaid, setShowPlaid] = useState(false);
   const [linkToken, setLinkToken] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [bankLinked, setBankLinked] = useState(false);
+  const [error, setError] = useState('');
 
+  // Fetch user info and check if bank is already linked
   useEffect(() => {
-    async function checkBankStatus() {
-      const res = await fetch("/api/users/should_link_bank", { credentials: "include" });
-      const data = await res.json();
-
-      if (data.should_link_bank) {
-        const tokenRes = await fetch("/plaid/link-token", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            client_user_id: "placeholder", // Replace with actual user ID
-            language: "en"
-          }),
+    async function initDashboard() {
+      try {
+        const userRes = await fetch('/api/users/me', {
+          credentials: 'include',
         });
+        const userData = await userRes.json();
+        setUserId(userData.id);
 
-        const tokenData = await tokenRes.json();
-        setLinkToken(tokenData.link_token);
-        setShowPlaid(true);
+        const linkStatus = await fetch('/api/users/should_link_bank', {
+          credentials: 'include',
+        });
+        const { should_link_bank } = await linkStatus.json();
+
+        setBankLinked(!should_link_bank);
+
+        if (should_link_bank) {
+          const tokenRes = await fetch('/api/plaid/link-token', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              client_user_id: userData.id,
+              language: 'en',
+            }),
+          });
+          const tokenData = await tokenRes.json();
+          setLinkToken(tokenData.link_token);
+        }
+      } catch (err) {
+        setError('Failed to load dashboard');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     }
 
-    checkBankStatus();
+    initDashboard();
   }, []);
 
   const { open, ready } = usePlaidLink({
     token: linkToken,
-    onSuccess: async (public_token, metadata) => {
-      await fetch("/plaid/exchange-public-token", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ public_token }),
-      });
-      setShowPlaid(false);
+    onSuccess: async (public_token) => {
+      try {
+        await fetch('/api/plaid/exchange-public-token', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ public_token }),
+        });
+        setBankLinked(true);
+      } catch (err) {
+        console.error('Plaid exchange error:', err);
+        setError('Something went wrong while linking your bank.');
+      }
+    },
+    onExit: () => {
+      console.log('User exited Plaid modal');
     },
   });
-
-  useEffect(() => {
-    if (showPlaid && ready) open();
-  }, [showPlaid, ready]);
 
   return (
     <div className="dashboard">
       <div className="dashboard-card">
         <h1>Welcome to your Dashboard</h1>
-        <p>Monitor your financial data here. Link a bank account to get started.</p>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="error-message">{error}</p>
+        ) : bankLinked ? (
+          <p>Your bank account is linked ✅</p>
+        ) : (
+          <>
+            <p>Connect your bank account to get started.</p>
+            <button
+              onClick={open}
+              disabled={!ready}
+              className="link-button"
+            >
+              Link Bank
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
