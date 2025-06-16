@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from ..deps import get_db
 from ..utils import hash_password, verify_password
@@ -34,31 +34,33 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
     # Generate JWT token
     token = create_access_token(data={"sub": new_user.email})
 
-    # Serialize user data
-    response_data = UserRead.model_validate(new_user)
+    # Serialize user data with datetime-safe output
+    response_data = UserRead.model_validate(new_user).model_dump(mode="json")
 
     # Return JSON response with token as httponly cookie
-    response = Response(
-        content=response_data.model_dump_json(),
-        media_type="application/json"
-    )
+    response = JSONResponse(content=response_data)
     response.set_cookie("access_token", token, httponly=True)
     return response
 
 
 @router.post("/login")
 def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
+    # Fetch user by email
     db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    # Verify password
+    if not db_user or not verify_password(user.password, db_user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    # Create user session
     ip = request.client.host
     user_agent = request.headers.get("user-agent", "")
     session = create_user_session(db, db_user.id, ip, user_agent)
 
-    # Use Pydantic model to serialize datetime fields correctly
-    user_data = UserRead.model_validate(db_user).model_dump()
+    # Serialize user using Pydantic model
+    user_data = UserRead.model_validate(db_user).model_dump(mode="json")
 
+    # Create response and set session token as secure, HttpOnly cookie
     response = JSONResponse(content={
         "message": "Login successful",
         "user": user_data
@@ -68,7 +70,7 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
         value=session.session_token,
         httponly=True,
         secure=True,
-        max_age=3600,
+        max_age=3600,  # 1 hour
         samesite="Lax"
     )
     return response
@@ -77,3 +79,9 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserRead)
 def get_me(current_user: User = Depends(get_current_user)):
     return UserRead.model_validate(current_user)
+
+
+#checking to see if we should link bank for users who havent
+@router.get("/should_link_bank")
+def should_link_bank(current_user: User = Depends(get_current_user)):
+    return {"should_link_bank": not current_user.has_linked_bank}

@@ -7,3 +7,4 @@ plaid-python==17.0.0
 passlib[bcrypt]
 python-jose[cryptography]
 pydantic-settings
+bcrypt==4.0.1
