@@ -50,7 +50,7 @@ router = APIRouter(prefix="/plaid", tags=["plaid"])
 class UserSettings(BaseModel):
     client_user_id: str
     language: str
-    phone_num: Optional[str] = None
+
 
     model_config = {"from_attributes": True}
 
@@ -67,7 +67,6 @@ def create_link_token(user_settings: UserSettings):
     req = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
             client_user_id=user_settings.client_user_id,
-            phone_number=user_settings.phone_num,
         ),
         client_name=APP_NAME,
         products=[Products("transactions")],

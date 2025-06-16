@@ -34,6 +34,7 @@ const SignUpPage = () => {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Signup failed');
+      localStorage.setItem("email", form.email);
 
       navigate('/dashboard');
     } catch (err) {
