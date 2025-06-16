@@ -1,33 +1,28 @@
+from fastapi import APIRouter, HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
+import os
+
 from plaid import Configuration, ApiClient
 from plaid.api import plaid_api
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
-from plaid.model.item_public_token_exchange_request import (
-    ItemPublicTokenExchangeRequest,
-)
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel
-from typing import Optional
-import os
-from sqlalchemy.orm import Session
+from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+
 from app.deps import get_db
 from app.core.auth import get_current_user
 from app.models import User, PlaidItem
 
-
-
-
 try:
-    from ...core.config import settings  
-
+    from ...core.config import settings
     PLAID_CLIENT_ID = settings.plaid_client_id
     PLAID_SECRET = settings.plaid_secret
     PLAID_ENV = settings.plaid_env
     APP_NAME = settings.app_name
 except ImportError:
-    # fallback to raw env vars
     PLAID_CLIENT_ID = os.getenv("PLAID_CLIENT_ID", "")
     PLAID_SECRET = os.getenv("PLAID_SECRET", "")
     PLAID_ENV = os.getenv("PLAID_ENV", "sandbox")
@@ -50,22 +45,25 @@ plaid_client = plaid_api.PlaidApi(ApiClient(configuration))
 
 router = APIRouter(prefix="/plaid", tags=["plaid"])
 
+# ----------------- Models -------------------
 
 class UserSettings(BaseModel):
     client_user_id: str
     language: str
     phone_num: Optional[str] = None
 
-    model_config = {"from_attributes": True}  # Pydantic v2
+    model_config = {"from_attributes": True}
 
 
 class PublicTokenRequest(BaseModel):
     public_token: str
 
 
+# ----------------- Routes -------------------
+
 @router.post("/link-token")
 def create_link_token(user_settings: UserSettings):
-    """link token needed for personal access token. sent to the client app"""
+    """Generate a Plaid Link token."""
     req = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
             client_user_id=user_settings.client_user_id,
@@ -79,9 +77,8 @@ def create_link_token(user_settings: UserSettings):
 
     try:
         resp = plaid_client.link_token_create(req)
-        return {"link_token": resp["link_token"]}
-
-    except Exception as e:  # pragma: no cover
+        return {"link_token": resp.link_token}
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Plaid link_token_create failed: {e}",
@@ -89,29 +86,31 @@ def create_link_token(user_settings: UserSettings):
 
 
 @router.post("/exchange-public-token")
-def exchange_public_token(payload: PublicTokenRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    """
-    Exchange the public_token received from the client for a permanent access_token + item_id.
-    """
+def exchange_public_token(
+    payload: PublicTokenRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Exchange a public_token for an access_token and item_id."""
     req = ItemPublicTokenExchangeRequest(public_token=payload.public_token)
 
     try:
         resp = plaid_client.item_public_token_exchange(req)
-        
-        # Save the access token for the authenticated user
+
         plaid_item = PlaidItem(
             user_id=current_user.id,
-            access_token=resp["access_token"],
-            item_id=resp["item_id"],
-            institution_id=resp.get("institution_id")
+            access_token=resp.access_token,
+            item_id=resp.item_id
         )
         db.add(plaid_item)
+
+        current_user.bank_linked = True  # make sure this column exists
         db.commit()
-        
-        return {"item_id": resp["item_id"]}
+
+        return {"item_id": resp.item_id}
     except Exception as e:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Plaid item_public_token_exchange failed: {e}"
+            detail=f"Plaid item_public_token_exchange failed: {e}",
         ) from e
