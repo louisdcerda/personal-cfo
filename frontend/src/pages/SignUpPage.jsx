@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import './SignUpPage.css';
+import './AuthStyling.css'; 
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ full_name: '', email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '', confirm_password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,6 +18,12 @@ const SignUpPage = () => {
     setIsLoading(true);
     setError('');
 
+    if (form.password !== form.confirm_password) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch('/api/users/signup', {
         method: 'POST',
@@ -42,22 +47,10 @@ const SignUpPage = () => {
   return (
     <div className="signup-page">
 
-
-
       <div className="form-container">
         <h2>Create your account</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <label>
-            Full Name
-            <input
-              name="full_name"
-              type="text"
-              value={form.full_name}
-              onChange={handleChange}
-              required
-            />
-          </label>
           <label>
             Email
             <input
@@ -81,9 +74,9 @@ const SignUpPage = () => {
           <label>
             Confirm Password
             <input
-              name="password"
+              name="confirm_password"
               type="password"
-              value={form.password}
+              value={form.confirm_password}
               onChange={handleChange}
               required
             />

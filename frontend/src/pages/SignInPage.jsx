@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import './SignInPage.css';
+import './AuthStyling.css'; 
 
 const SignInPage = () => {
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
   };
 
@@ -24,19 +22,17 @@ const SignInPage = () => {
       const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(form),
       });
 
       const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Login failed');
 
-      if (!response.ok) {
-        throw new Error(data.detail || 'Login failed');
-      }
-
+      localStorage.setItem('token', data.token);
       navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
-      console.error('Signin failed:', err);
+    } catch (error) {
+      setError(error.message || 'Something went wrong.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -47,30 +43,37 @@ const SignInPage = () => {
       <div className="form-container">
         <h2>Welcome Back</h2>
         {error && <div className="error-message">{error}</div>}
-        <form onSubmit={handleSubmit} className="signin-form">
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            value={credentials.email}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            value={credentials.password}
-            onChange={handleChange}
-            required
-          />
+        <form onSubmit={handleSubmit}>
+          <label>
+            Email
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label>
+            Password
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </label>
           <div className="form-footer">
             <Link to="/forgot-password" className="forgot-link">Forgot Password?</Link>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </Button>
           </div>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </button>
         </form>
+        <p>
+          Don’t have an account? <Link to="/signup">Sign Up</Link>
+        </p>
       </div>
     </div>
   );

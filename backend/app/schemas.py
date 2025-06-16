@@ -10,25 +10,22 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: Optional[str] = None
 
 
 class UserCreate(UserBase):
-    full_name: str
     email: EmailStr
     password: str
 
 
-class UserRead(UserBase):
+class UserRead(BaseModel):
     id: int
-    name: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    has_linked_bank: bool
 
     class Config:
-        from_attributes = True
-
+        from_attributes = True  
 
 class UserLogin(BaseModel):
     email: EmailStr
