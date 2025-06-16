@@ -4,14 +4,18 @@ from sqlalchemy.orm import Session
 from ..deps import get_db
 from ..utils import hash_password, verify_password
 from app.models import User, UserSession
-from app.core.auth import create_access_token, create_user_session, get_current_user
+from app.core.auth import create_user_session, get_current_user
 from app.schemas import UserCreate, UserRead, UserLogin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/signup", response_model=UserRead)
-def user_signup(user: UserCreate, db: Session = Depends(get_db)):
+def user_signup(
+    user: UserCreate,
+    request: Request,
+    db: Session = Depends(get_db)
+):
     # Check if user already exists
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -31,17 +35,26 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Generate JWT token
-    token = create_access_token(data={"sub": new_user.email})
+    # Create user session (generate token, save to DB)
+    ip = request.client.host
+    user_agent = request.headers.get("user-agent", "")
+    session = create_user_session(db, new_user.id, ip, user_agent)
 
-    # Serialize user data with datetime-safe output
+    # Serialize user data
     response_data = UserRead.model_validate(new_user).model_dump(mode="json")
 
-    # Return JSON response with token as httponly cookie
+    # Return response with session token cookie
     response = JSONResponse(content=response_data)
-    response.set_cookie("access_token", token, httponly=True)
+    response.set_cookie(
+        key="session_token",
+        value=session.session_token,
+        httponly=True,
+        secure=False,  # Change to True in production with HTTPS
+        samesite="lax",
+        path="/",
+        max_age=3600
+    )
     return response
-
 
 @router.post("/login")
 def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
@@ -69,9 +82,10 @@ def login(user: UserLogin, request: Request, db: Session = Depends(get_db)):
         key="session_token",
         value=session.session_token,
         httponly=True,
-        secure=True,
+        secure=False,
         max_age=3600,  # 1 hour
-        samesite="Lax"
+        samesite="Lax",
+        path="/"
     )
     return response
 
@@ -88,7 +102,7 @@ def should_link_bank(current_user: User = Depends(get_current_user)):
 
 
 # after a user has linked their account update db
-@router.post("update_link_bank")
+@router.post("/update_link_bank")
 def update_link_bank(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     current_user.has_linked_bank = True
     db.commit()
