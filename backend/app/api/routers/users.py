@@ -54,7 +54,7 @@ def get_me(current_user: User = Depends(get_current_user)):
     return UserRead.model_validate(current_user)
 
 
-#checking to see if we should link bank for users who havent
+# checking to see if we should link bank for users who havent
 @router.get("/should_link_bank")
 def should_link_bank(current_user: User = Depends(get_current_user)):
     return {"should_link_bank": not current_user.has_linked_bank}
@@ -63,7 +63,9 @@ def should_link_bank(current_user: User = Depends(get_current_user)):
 # after a user has linked their account update db
 @router.post("/update_link_bank")
 def update_link_bank(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    print(current_user.has_linked_bank)
     current_user.has_linked_bank = True
+    print(current_user.has_linked_bank)
     db.commit()
     return {"success": True}
 

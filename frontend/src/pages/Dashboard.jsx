@@ -28,13 +28,8 @@ const Dashboard = () => {
 
         if (should_link_bank) {
           const tokenRes = await fetch('/api/plaid/link-token', {
-            method: 'POST',
+            method: 'GET',
             credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              client_user_id: userData.id,
-              language: 'en',
-            }),
           });
           const tokenData = await tokenRes.json();
           setLinkToken(tokenData.link_token);
@@ -61,6 +56,14 @@ const Dashboard = () => {
           body: JSON.stringify({ public_token }),
         });
         setBankLinked(true);
+
+        // update link bank in db after success
+        const update_link_bank_db = await fetch("/api/users/update_link_bank", {
+          method: "POST",
+          credentials: "include"
+        });
+        console.log(update_link_bank_db);
+
       } catch (err) {
         console.error('Plaid exchange error:', err);
         setError('Something went wrong while linking your bank.');

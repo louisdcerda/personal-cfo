@@ -51,9 +51,7 @@ class UserSettings(BaseModel):
     client_user_id: str
     language: str
 
-
     model_config = {"from_attributes": True}
-
 
 class PublicTokenRequest(BaseModel):
     public_token: str
@@ -61,17 +59,18 @@ class PublicTokenRequest(BaseModel):
 
 # ----------------- Routes -------------------
 
-@router.post("/link-token")
-def create_link_token(user_settings: UserSettings):
+@router.get("/link-token")
+def create_link_token():
     """Generate a Plaid Link token."""
     req = LinkTokenCreateRequest(
         user=LinkTokenCreateRequestUser(
-            client_user_id=user_settings.client_user_id,
+            # client_user_id=PLAID_CLIENT_ID,
+            client_user_id='user_good'
         ),
         client_name=APP_NAME,
         products=[Products("transactions")],
         country_codes=[CountryCode("US")],
-        language=user_settings.language,
+        language="en",
     )
 
     try:
@@ -92,7 +91,7 @@ def exchange_public_token(
 ):
     """Exchange a public_token for an access_token and item_id."""
     req = ItemPublicTokenExchangeRequest(public_token=payload.public_token)
-
+    print(payload)
     try:
         resp = plaid_client.item_public_token_exchange(req)
 
