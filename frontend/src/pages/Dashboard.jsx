@@ -4,95 +4,105 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const [linkToken, setLinkToken] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [bankLinked, setBankLinked] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch user info and check if bank is already linked
+  // Fetch whether we need to link bank and, if so, get a linkToken
   useEffect(() => {
-    async function initDashboard() {
+    const init = async () => {
       try {
-        const userRes = await fetch('/api/users/me', {
-          credentials: 'include',
-        });
-        const userData = await userRes.json();
-        setUserId(userData.id);
-
-        const linkStatus = await fetch('/api/users/should_link_bank', {
-          credentials: 'include',
-        });
-        const { should_link_bank } = await linkStatus.json();
-
+        const statusRes = await fetch('/api/users/should_link_bank', { credentials: 'include' });
+        if (!statusRes.ok) throw new Error('Status check failed');
+        const { should_link_bank } = await statusRes.json();
         setBankLinked(!should_link_bank);
 
         if (should_link_bank) {
-          const tokenRes = await fetch('/api/plaid/link-token', {
-            method: 'GET',
-            credentials: 'include',
-          });
-          const tokenData = await tokenRes.json();
-          setLinkToken(tokenData.link_token);
+          const tokenRes = await fetch('/api/plaid/link-token', { credentials: 'include' });
+          if (!tokenRes.ok) throw new Error('Failed to fetch link token');
+          const { link_token } = await tokenRes.json();
+          setLinkToken(link_token);
         }
       } catch (err) {
-        setError('Failed to load dashboard');
         console.error(err);
+        setError(err.message || 'Unknown error');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
-    }
-
-    initDashboard();
+    };
+    init();
   }, []);
 
+  // Configure Plaid Link once we have a linkToken
   const { open, ready } = usePlaidLink({
-    token: linkToken,
-    onSuccess: async (public_token) => {
+    token: linkToken || '',
+    onSuccess: async (public_token, metadata) => {
       try {
-        await fetch('/api/plaid/exchange-public-token', {
+        // Exchange the public_token for an access token
+        const exchangeRes = await fetch('/api/plaid/exchange-public-token', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ public_token }),
         });
+        if (!exchangeRes.ok) throw new Error('Exchange failed');
         setBankLinked(true);
 
-        // update link bank in db after success
-        const update_link_bank_db = await fetch("/api/users/update_link_bank", {
-          method: "POST",
-          credentials: "include"
+        // Mark in our DB that the user has linked their bank
+        const updateRes = await fetch('/api/users/update_link_bank', {
+          method: 'POST',
+          credentials: 'include',
         });
-        console.log(update_link_bank_db);
-
+        const updateJson = await updateRes.json();
+        if (!updateRes.ok || updateJson.error) {
+          console.warn('Backend update error', updateJson);
+        }
       } catch (err) {
-        console.error('Plaid exchange error:', err);
-        setError('Something went wrong while linking your bank.');
+        console.error('Plaid onSuccess error:', err);
+        setError('Something went wrong during bank link.');
       }
     },
-    onExit: () => {
-      console.log('User exited Plaid modal');
+    onExit: (err) => {
+      if (err) console.warn('User exited Plaid Link with error:', err);
     },
   });
 
+  // Loading / error states
+  if (loading) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard-card">
+          <p>Loading your dashboard…</p>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard-card">
+          <p className="error-message">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Main UI
   return (
     <div className="dashboard">
       <div className="dashboard-card">
         <h1>Welcome to your Dashboard</h1>
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="error-message">{error}</p>
-        ) : bankLinked ? (
+        {bankLinked ? (
           <p>Your bank account is linked ✅</p>
         ) : (
           <>
             <p>Connect your bank account to get started.</p>
             <button
+              className="link-button"
               onClick={open}
               disabled={!ready}
-              className="link-button"
             >
-              Link Bank
+              {ready ? 'Link Bank' : 'Preparing…'}
             </button>
           </>
         )}

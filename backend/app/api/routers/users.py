@@ -62,15 +62,21 @@ def should_link_bank(current_user: User = Depends(get_current_user)):
 
 # after a user has linked their account update db
 @router.post("/update_link_bank")
-def update_link_bank(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    print(current_user.has_linked_bank)
-    current_user.has_linked_bank = True
-    print(current_user.has_linked_bank)
+def update_link_bank(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Re-fetch the user within *this* session
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Toggle the flag and commit
+    user.has_linked_bank = True
     db.commit()
+    db.refresh(user)   # now `user.has_linked_bank` is definitely True
+
     return {"success": True}
-
-
-
 
 
 # loging in function 
