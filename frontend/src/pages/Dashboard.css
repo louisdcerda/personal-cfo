@@ -1,0 +1,50 @@
+.dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: white;
+}
+
+.dashboard-card {
+  background: #f9f7ff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: 90%;
+  max-width: 480px;
+}
+
+.dashboard-card h1 {
+  font-size: 2rem;
+  color: #5e3fd7;
+  margin-bottom: 1rem;
+}
+
+.dashboard-card p {
+  color: #333;
+  font-size: 1rem;
+}
+
+.link-button {
+  padding: 12px 24px;
+  background-color: #5e3fd7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.link-button:disabled {
+  background-color: #c0b6f6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}

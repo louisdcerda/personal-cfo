@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './AuthStyling.css'; 
+import './AuthStyling.css';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -23,22 +23,23 @@ const SignUpPage = () => {
       setIsLoading(false);
       return;
     }
-    
+
     try {
       const response = await fetch('/api/users/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
+        credentials: 'include',
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Signup failed');
+      localStorage.setItem("email", form.email);
 
-      localStorage.setItem('token', data.token);
       navigate('/dashboard');
-    } catch (error) {
-      setError(error.message || 'Something went wrong.');
-      console.error('Signup error:', error);
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+      console.error('Signup error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +47,6 @@ const SignUpPage = () => {
 
   return (
     <div className="signup-page">
-
       <div className="form-container">
         <h2>Create your account</h2>
         {error && <div className="error-message">{error}</div>}
@@ -59,6 +59,7 @@ const SignUpPage = () => {
               value={form.email}
               onChange={handleChange}
               required
+              style={{ color: 'black' }}
             />
           </label>
           <label>
@@ -69,6 +70,7 @@ const SignUpPage = () => {
               value={form.password}
               onChange={handleChange}
               required
+              style={{ color: 'black' }}
             />
           </label>
           <label>
@@ -79,6 +81,7 @@ const SignUpPage = () => {
               value={form.confirm_password}
               onChange={handleChange}
               required
+              style={{ color: 'black' }}
             />
           </label>
           <button type="submit" disabled={isLoading}>

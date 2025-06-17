@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './AuthStyling.css'; 
+import './AuthStyling.css';
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -23,16 +23,16 @@ const SignInPage = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
+        credentials: 'include',
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Login failed');
-
-      localStorage.setItem('token', data.token);
+      localStorage.setItem("email", form.email);
       navigate('/dashboard');
-    } catch (error) {
-      setError(error.message || 'Something went wrong.');
-      console.error('Login error:', error);
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -52,6 +52,7 @@ const SignInPage = () => {
               value={form.email}
               onChange={handleChange}
               required
+              style={{ color: 'black' }}
             />
           </label>
           <label>
@@ -62,6 +63,7 @@ const SignInPage = () => {
               value={form.password}
               onChange={handleChange}
               required
+              style={{ color: 'black' }}
             />
           </label>
           <div className="form-footer">
