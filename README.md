@@ -1,28 +1,30 @@
-# Peronsal CFO
+# Personal CFO
+
 AI-powered, real-time budgeting for busy people.
 
 > **One-liner**  
-> “Connect your bank in 30 seconds and get a daily chat message that tells you exactly what to adjust to stay on budget”
+> “Connect your bank in 30 seconds and get a daily chat message that tells you exactly what to adjust to stay on budget.”
 
 ---
 
-## ✨ Features (MVP v0)
-* 🔌 **Secure account aggregation** — Plaid sandbox today, open-banking in prod  
-* 📊 **Auto-categorized spend feed** — enriched with ML embeddings  
-* 🤖 **LLM spending coach** — rewrites cold numbers into friendly, actionable nudges  
-* 📱 **Daily SMS / in-app push** — zero-friction habit loop
+## Features (MVP v0)
+
+- **Secure account aggregation** — Plaid Sandbox integration for development, open banking support planned for production  
+- **Auto-categorized spend feed** — transactions enriched using machine learning embeddings  
+- **LLM spending coach** — translates raw financial data into actionable, conversational nudges  
+- **Daily SMS / in-app push notifications** — enables a frictionless budgeting habit loop
 
 ---
 
-## 🏗️ Architecture
+## Architecture
+
 ```mermaid
 graph TD
     subgraph Containers
-        A[FastAPI (api)] -->|SQLAlchemy| C[(Postgres)]
-        B[Worker (schedule)] -->|SQLAlchemy| C
+        A[FastAPI (API)] -->|SQLAlchemy| C[(PostgreSQL)]
+        B[Worker (Scheduler)] -->|SQLAlchemy| C
         B -->|Plaid API| D[Plaid]
-        B -->|OpenAI| E[LLM]
-        B -->|Twilio| F[SMS]
+        B -->|OpenAI API| E[LLM]
+        B -->|Twilio API| F[SMS]
     end
     click A href "http://localhost:8000/docs" "Swagger UI"
-
