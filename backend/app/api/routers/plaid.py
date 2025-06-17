@@ -91,7 +91,6 @@ def exchange_public_token(
 ):
     """Exchange a public_token for an access_token and item_id."""
     req = ItemPublicTokenExchangeRequest(public_token=payload.public_token)
-    print(payload)
     try:
         resp = plaid_client.item_public_token_exchange(req)
 
@@ -102,7 +101,6 @@ def exchange_public_token(
         )
         db.add(plaid_item)
 
-        current_user.bank_linked = True  # make sure this column exists
         db.commit()
 
         return {"item_id": resp.item_id}
@@ -112,3 +110,4 @@ def exchange_public_token(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Plaid item_public_token_exchange failed: {e}",
         ) from e
+    
